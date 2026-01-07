@@ -1,0 +1,42 @@
+{
+  "name": "@manufosela/game-tetris",
+  "version": "1.0.0",
+  "description": "Complete Tetris game implementation as a Lit 3 web component with full keyboard controls",
+  "main": "src/game-tetris.js",
+  "module": "src/game-tetris.js",
+  "type": "module",
+  "files": [
+    "src/**/*"
+  ],
+  "scripts": {
+    "dev": "web-dev-server --node-resolve --open demo/",
+    "build": "echo 'No build step required'",
+    "test": "web-test-runner test/**/*.test.js --node-resolve --coverage",
+    "lint": "eslint src/**/*.js"
+  },
+  "keywords": [
+    "web-component",
+    "lit",
+    "tetris",
+    "game",
+    "canvas",
+    "arcade"
+  ],
+  "author": "manufosela",
+  "license": "MIT",
+  "dependencies": {
+    "lit": "^3.1.0"
+  },
+  "devDependencies": {
+    "@open-wc/testing": "^4.0.0",
+    "@web/dev-server": "^0.4.1",
+    "@web/test-runner": "^0.18.0",
+    "eslint": "^8.56.0"
+  },
+  "customElements": "custom-elements.json",
+  "exports": {
+    ".": {
+      "import": "./src/game-tetris.js"
+    }
+  }
+}

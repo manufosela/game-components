@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@manufosela/games-components</title>
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --bg: #0f172a;
+      --bg-card: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --accent: #34d399;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header {
+      text-align: center;
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 3rem;
+    }
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--accent), #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+    .subtitle { color: var(--text-muted); font-size: 1.2rem; }
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+    }
+    .stat {
+      text-align: center;
+      padding: 1rem 2rem;
+      background: var(--bg-card);
+      border-radius: 0.5rem;
+    }
+    .stat-value { font-size: 2rem; font-weight: bold; color: var(--accent); }
+    .stat-label { color: var(--text-muted); font-size: 0.875rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent), #06b6d4);
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    .card-title { font-size: 1.25rem; font-weight: 600; }
+    .card-desc { color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; }
+    .card-links {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline {
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-outline:hover { background: var(--bg); }
+    footer {
+      text-align: center;
+      padding: 3rem 0;
+      margin-top: 3rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>@manufosela/games-components</h1>
+      <p class="subtitle">Game development web components built with Lit 3</p>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value">4</div>
+          <div class="stat-label">Components</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">Lit 3</div>
+          <div class="stat-label">Framework</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">MIT</div>
+          <div class="stat-label">License</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">🎮</div>
+          <h2 class="card-title">convgame-object</h2>
+        </div>
+        <p class="card-desc">Game object wrapper with physics simulation including velocity, mass, friction, and collision detection.</p>
+        <div class="card-links">
+          <a href="packages/convgame-object/demo/" class="btn btn-primary">Demo</a>
+          <a href="https://github.com/manufosela/games-components/tree/main/packages/convgame-object" class="btn btn-outline">Source</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">🦠</div>
+          <h2 class="card-title">living-wccell</h2>
+        </div>
+        <p class="card-desc">Cellular automaton cell component implementing Conway's Game of Life and custom rules.</p>
+        <div class="card-links">
+          <a href="packages/living-wccell/demo/" class="btn btn-primary">Demo</a>
+          <a href="https://github.com/manufosela/games-components/tree/main/packages/living-wccell" class="btn btn-outline">Source</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">🧱</div>
+          <h2 class="card-title">game-tetris</h2>
+        </div>
+        <p class="card-desc">Complete Tetris game implementation with keyboard controls, scoring, and level progression.</p>
+        <div class="card-links">
+          <a href="packages/game-tetris/demo/" class="btn btn-primary">Demo</a>
+          <a href="https://github.com/manufosela/games-components/tree/main/packages/game-tetris" class="btn btn-outline">Source</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">🎨</div>
+          <h2 class="card-title">board-layer</h2>
+        </div>
+        <p class="card-desc">Multi-layer canvas game board for managing multiple rendering layers with grid support.</p>
+        <div class="card-links">
+          <a href="packages/board-layer/demo/" class="btn btn-primary">Demo</a>
+          <a href="https://github.com/manufosela/games-components/tree/main/packages/board-layer" class="btn btn-outline">Source</a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>Created by <a href="https://github.com/manufosela">@manufosela</a></p>
+      <p style="margin-top: 0.5rem;">Built with Lit 3 | pnpm workspaces | Changesets</p>
+    </footer>
+  </div>
+</body>
+</html>

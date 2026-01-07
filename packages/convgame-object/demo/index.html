@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>convgame-object Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #4a90d9;
+      margin-bottom: 10px;
+    }
+
+    .description {
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+
+    .game-container {
+      position: relative;
+      width: 800px;
+      height: 500px;
+      background: #16213e;
+      border: 2px solid #4a90d9;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      background: #4a90d9;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #357abd;
+    }
+
+    button.active {
+      background: #2ecc71;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: #16213e;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #333;
+    }
+
+    .stat-card h3 {
+      margin: 0 0 10px 0;
+      color: #4a90d9;
+      font-size: 14px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .event-log {
+      background: #0f0f1a;
+      padding: 15px;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .event-log p {
+      margin: 5px 0;
+      padding: 5px;
+      background: #16213e;
+      border-radius: 4px;
+    }
+
+    .event-log p.collision {
+      border-left: 3px solid #e74c3c;
+    }
+
+    .event-log p.boundary {
+      border-left: 3px solid #f39c12;
+    }
+
+    .event-log p.position {
+      border-left: 3px solid #2ecc71;
+    }
+
+    /* Custom theming for game objects */
+    convgame-object.ball {
+      --convgame-object-debug-color: lime;
+    }
+
+    convgame-object.obstacle {
+      --convgame-object-debug-color: orange;
+    }
+  </style>
+</head>
+<body>
+  <h1>convgame-object Demo</h1>
+  <p class="description">A physics-enabled game object component with collision detection, forces, and boundary handling.</p>
+
+  <div class="controls">
+    <button id="startBtn">Start Simulation</button>
+    <button id="pauseBtn">Pause</button>
+    <button id="resetBtn">Reset</button>
+    <button id="debugBtn">Toggle Debug</button>
+    <button id="addBallBtn">Add Ball</button>
+    <button id="applyForceBtn">Apply Random Force</button>
+  </div>
+
+  <div class="game-container" id="gameContainer">
+    <convgame-object
+      id="ball1"
+      class="ball"
+      x="100"
+      y="100"
+      width="40"
+      height="40"
+      velocity-x="3"
+      velocity-y="2"
+      mass="1"
+      friction="0.995"
+      restitution="0.9"
+    ></convgame-object>
+
+    <convgame-object
+      id="ball2"
+      class="ball"
+      x="400"
+      y="200"
+      width="60"
+      height="60"
+      velocity-x="-2"
+      velocity-y="3"
+      mass="2"
+      friction="0.995"
+      restitution="0.9"
+    ></convgame-object>
+
+    <convgame-object
+      id="obstacle"
+      class="obstacle"
+      x="350"
+      y="350"
+      width="100"
+      height="30"
+      is-static
+    ></convgame-object>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <h3>Ball 1 Position</h3>
+      <div class="stat-value" id="ball1Pos">0, 0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Ball 1 Velocity</h3>
+      <div class="stat-value" id="ball1Vel">0, 0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Collision Count</h3>
+      <div class="stat-value" id="collisionCount">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Boundary Hits</h3>
+      <div class="stat-value" id="boundaryCount">0</div>
+    </div>
+  </div>
+
+  <h3>Event Log</h3>
+  <div class="event-log" id="eventLog"></div>
+
+  <script type="module">
+    import '../src/convgame-object.js';
+
+    const container = document.getElementById('gameContainer');
+    const eventLog = document.getElementById('eventLog');
+    const ball1 = document.getElementById('ball1');
+    const ball2 = document.getElementById('ball2');
+    const obstacle = document.getElementById('obstacle');
+
+    let running = false;
+    let animationId = null;
+    let collisionCount = 0;
+    let boundaryCount = 0;
+    let ballCounter = 2;
+
+    // Get all game objects
+    const getGameObjects = () => Array.from(container.querySelectorAll('convgame-object'));
+
+    // Set bounds for all objects
+    const setBounds = () => {
+      const bounds = {
+        minX: 0,
+        maxX: container.offsetWidth,
+        minY: 0,
+        maxY: container.offsetHeight
+      };
+      getGameObjects().forEach(obj => {
+        obj.bounds = bounds;
+      });
+    };
+
+    // Custom render functions
+    const renderBall = (ctx, width, height) => {
+      ctx.beginPath();
+      ctx.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#4a90d9';
+      ctx.fill();
+      ctx.strokeStyle = '#2d5a8a';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    };
+
+    const renderObstacle = (ctx, width, height) => {
+      ctx.fillStyle = '#e74c3c';
+      ctx.fillRect(0, 0, width, height);
+      ctx.strokeStyle = '#c0392b';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(0, 0, width, height);
+    };
+
+    // Apply render functions
+    ball1.renderFn = renderBall;
+    ball2.renderFn = renderBall;
+    obstacle.renderFn = renderObstacle;
+
+    // Initialize bounds
+    setBounds();
+
+    // Log event helper
+    const logEvent = (message, type = 'position') => {
+      const p = document.createElement('p');
+      p.className = type;
+      p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      eventLog.insertBefore(p, eventLog.firstChild);
+      if (eventLog.children.length > 50) {
+        eventLog.removeChild(eventLog.lastChild);
+      }
+    };
+
+    // Event listeners for all objects
+    const setupEventListeners = (obj, name) => {
+      obj.addEventListener('collision', (e) => {
+        collisionCount++;
+        document.getElementById('collisionCount').textContent = collisionCount;
+        logEvent(`${name} collided with another object`, 'collision');
+      });
+
+      obj.addEventListener('boundary-hit', (e) => {
+        boundaryCount++;
+        document.getElementById('boundaryCount').textContent = boundaryCount;
+        logEvent(`${name} hit ${e.detail.boundary} boundary`, 'boundary');
+      });
+    };
+
+    setupEventListeners(ball1, 'Ball 1');
+    setupEventListeners(ball2, 'Ball 2');
+
+    // Update stats display
+    const updateStats = () => {
+      document.getElementById('ball1Pos').textContent =
+        `${ball1.x.toFixed(1)}, ${ball1.y.toFixed(1)}`;
+      document.getElementById('ball1Vel').textContent =
+        `${ball1.velocityX.toFixed(2)}, ${ball1.velocityY.toFixed(2)}`;
+    };
+
+    // Game loop
+    const gameLoop = () => {
+      if (!running) return;
+
+      const objects = getGameObjects();
+
+      // Update all objects
+      objects.forEach(obj => obj.update());
+
+      // Check collisions between all pairs
+      for (let i = 0; i < objects.length; i++) {
+        for (let j = i + 1; j < objects.length; j++) {
+          if (objects[i].collidesWith(objects[j])) {
+            objects[i].resolveCollision(objects[j]);
+          }
+        }
+      }
+
+      updateStats();
+      animationId = requestAnimationFrame(gameLoop);
+    };
+
+    // Control handlers
+    document.getElementById('startBtn').addEventListener('click', () => {
+      running = true;
+      document.getElementById('startBtn').classList.add('active');
+      gameLoop();
+      logEvent('Simulation started', 'position');
+    });
+
+    document.getElementById('pauseBtn').addEventListener('click', () => {
+      running = false;
+      document.getElementById('startBtn').classList.remove('active');
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+      logEvent('Simulation paused', 'position');
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      running = false;
+      document.getElementById('startBtn').classList.remove('active');
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+
+      // Reset positions
+      ball1.setPosition(100, 100);
+      ball1.setVelocity(3, 2);
+      ball2.setPosition(400, 200);
+      ball2.setVelocity(-2, 3);
+
+      // Remove extra balls
+      getGameObjects().forEach(obj => {
+        if (!['ball1', 'ball2', 'obstacle'].includes(obj.id)) {
+          obj.remove();
+        }
+      });
+
+      collisionCount = 0;
+      boundaryCount = 0;
+      ballCounter = 2;
+      document.getElementById('collisionCount').textContent = '0';
+      document.getElementById('boundaryCount').textContent = '0';
+
+      updateStats();
+      logEvent('Simulation reset', 'position');
+    });
+
+    document.getElementById('debugBtn').addEventListener('click', () => {
+      getGameObjects().forEach(obj => {
+        obj.debug = !obj.debug;
+      });
+    });
+
+    document.getElementById('addBallBtn').addEventListener('click', () => {
+      ballCounter++;
+      const newBall = document.createElement('convgame-object');
+      newBall.id = `ball${ballCounter}`;
+      newBall.className = 'ball';
+      newBall.x = Math.random() * 700 + 50;
+      newBall.y = Math.random() * 400 + 50;
+      newBall.width = 30 + Math.random() * 40;
+      newBall.height = newBall.width;
+      newBall.velocityX = (Math.random() - 0.5) * 8;
+      newBall.velocityY = (Math.random() - 0.5) * 8;
+      newBall.mass = newBall.width / 40;
+      newBall.friction = 0.995;
+      newBall.restitution = 0.9;
+      newBall.renderFn = renderBall;
+
+      const bounds = {
+        minX: 0,
+        maxX: container.offsetWidth,
+        minY: 0,
+        maxY: container.offsetHeight
+      };
+      newBall.bounds = bounds;
+
+      setupEventListeners(newBall, `Ball ${ballCounter}`);
+      container.appendChild(newBall);
+
+      logEvent(`Added Ball ${ballCounter}`, 'position');
+    });
+
+    document.getElementById('applyForceBtn').addEventListener('click', () => {
+      getGameObjects().forEach(obj => {
+        if (!obj.isStatic) {
+          const forceX = (Math.random() - 0.5) * 20;
+          const forceY = (Math.random() - 0.5) * 20;
+          obj.applyForce(forceX, forceY);
+        }
+      });
+      logEvent('Applied random forces', 'position');
+    });
+
+    // Initial stats update
+    updateStats();
+  </script>
+</body>
+</html>

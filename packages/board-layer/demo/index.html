@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>board-layer Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #0f0f1a;
+      color: #eee;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #4a90d9;
+      margin-bottom: 10px;
+    }
+
+    .description {
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+
+    .demo-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .board-wrapper {
+      flex: 1;
+      min-width: 500px;
+    }
+
+    .controls {
+      width: 280px;
+    }
+
+    .control-section {
+      background: #16213e;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .control-section h3 {
+      margin: 0 0 15px 0;
+      color: #4a90d9;
+      font-size: 14px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .control-row label {
+      flex: 1;
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .control-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+    }
+
+    .control-row input[type="range"] {
+      width: 100px;
+    }
+
+    .control-row select {
+      background: #0f0f1a;
+      color: #fff;
+      border: 1px solid #333;
+      padding: 5px;
+      border-radius: 4px;
+    }
+
+    .control-row span {
+      min-width: 30px;
+      font-size: 12px;
+      color: #4a90d9;
+    }
+
+    button {
+      padding: 8px 16px;
+      font-size: 12px;
+      background: #4a90d9;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 5px;
+      margin-bottom: 5px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #357abd;
+    }
+
+    button.danger {
+      background: #e74c3c;
+    }
+
+    button.danger:hover {
+      background: #c0392b;
+    }
+
+    .layer-list {
+      margin-top: 10px;
+    }
+
+    .layer-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      background: #0f0f1a;
+      border-radius: 4px;
+      margin-bottom: 5px;
+      font-size: 11px;
+    }
+
+    .layer-item .name {
+      flex: 1;
+      color: #4a90d9;
+    }
+
+    .layer-item .z-index {
+      color: #666;
+    }
+
+    .event-log {
+      background: #0f0f1a;
+      padding: 10px;
+      border-radius: 4px;
+      max-height: 150px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 10px;
+    }
+
+    .event-log p {
+      margin: 3px 0;
+      padding: 3px 6px;
+      background: #16213e;
+      border-radius: 2px;
+    }
+
+    /* Custom board styling */
+    board-layer {
+      --board-layer-bg: #0a0a15;
+      --board-layer-border: 3px solid #4a90d9;
+      --board-layer-grid-color: rgba(74, 144, 217, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <h1>board-layer Demo</h1>
+  <p class="description">Multi-layer canvas game board component for creating layered game graphics.</p>
+
+  <div class="demo-container">
+    <div class="board-wrapper">
+      <board-layer
+        id="board"
+        width="600"
+        height="400"
+        grid-size="25"
+        show-grid
+      ></board-layer>
+    </div>
+
+    <div class="controls">
+      <div class="control-section">
+        <h3>Board Settings</h3>
+        <div class="control-row">
+          <label>Show Grid:</label>
+          <input type="checkbox" id="showGrid" checked>
+        </div>
+        <div class="control-row">
+          <label>Grid Size:</label>
+          <input type="range" id="gridSize" min="10" max="50" value="25">
+          <span id="gridSizeValue">25</span>
+        </div>
+        <div class="control-row">
+          <label>Debug Mode:</label>
+          <input type="checkbox" id="debugMode">
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h3>Layer Controls</h3>
+        <button id="addLayerBtn">Add Layer</button>
+        <button id="clearAllBtn" class="danger">Clear All</button>
+
+        <div class="layer-list" id="layerList"></div>
+      </div>
+
+      <div class="control-section">
+        <h3>Drawing</h3>
+        <div class="control-row">
+          <label>Target Layer:</label>
+          <select id="targetLayer"></select>
+        </div>
+        <button id="drawRectBtn">Draw Rect</button>
+        <button id="drawCircleBtn">Draw Circle</button>
+        <button id="drawPatternBtn">Draw Pattern</button>
+        <button id="animateBtn">Animate</button>
+      </div>
+
+      <div class="control-section">
+        <h3>Event Log</h3>
+        <div class="event-log" id="eventLog"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import '../src/board-layer.js';
+
+    const board = document.getElementById('board');
+    const eventLog = document.getElementById('eventLog');
+    const layerList = document.getElementById('layerList');
+    const targetLayerSelect = document.getElementById('targetLayer');
+
+    let layerCounter = 0;
+    let animating = false;
+    let animationId = null;
+
+    // Initialize with default layers
+    const defaultLayers = [
+      { name: 'background', zIndex: 0 },
+      { name: 'sprites', zIndex: 10 },
+      { name: 'effects', zIndex: 20 },
+      { name: 'ui', zIndex: 30 }
+    ];
+
+    defaultLayers.forEach(config => board.addLayer(config));
+
+    // Draw initial background
+    const bgCtx = board.getContext('background');
+    const gradient = bgCtx.createLinearGradient(0, 0, 0, board.height);
+    gradient.addColorStop(0, '#1a1a2e');
+    gradient.addColorStop(1, '#16213e');
+    bgCtx.fillStyle = gradient;
+    bgCtx.fillRect(0, 0, board.width, board.height);
+
+    // Helper functions
+    function logEvent(message) {
+      const p = document.createElement('p');
+      p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      eventLog.insertBefore(p, eventLog.firstChild);
+      if (eventLog.children.length > 15) {
+        eventLog.removeChild(eventLog.lastChild);
+      }
+    }
+
+    function updateLayerList() {
+      const names = board.getLayerNames();
+      layerList.innerHTML = '';
+      targetLayerSelect.innerHTML = '';
+
+      const sortedLayers = names.map(name => board.getLayer(name))
+        .sort((a, b) => a.zIndex - b.zIndex);
+
+      sortedLayers.forEach(layer => {
+        // Layer list item
+        const item = document.createElement('div');
+        item.className = 'layer-item';
+        item.innerHTML = `
+          <span class="name">${layer.name}</span>
+          <span class="z-index">z:${layer.zIndex}</span>
+          <input type="checkbox" ${layer.visible ? 'checked' : ''} data-layer="${layer.name}">
+          <input type="range" min="0" max="100" value="${layer.opacity * 100}" style="width:60px" data-layer="${layer.name}" data-type="opacity">
+        `;
+        layerList.appendChild(item);
+
+        // Select option
+        const option = document.createElement('option');
+        option.value = layer.name;
+        option.textContent = layer.name;
+        targetLayerSelect.appendChild(option);
+      });
+
+      // Add visibility toggle handlers
+      layerList.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+          board.setLayerVisibility(e.target.dataset.layer, e.target.checked);
+        });
+      });
+
+      // Add opacity handlers
+      layerList.querySelectorAll('input[type="range"]').forEach(slider => {
+        slider.addEventListener('input', (e) => {
+          board.setLayerOpacity(e.target.dataset.layer, parseInt(e.target.value) / 100);
+        });
+      });
+    }
+
+    function randomColor() {
+      const colors = ['#4a90d9', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', '#1abc9c'];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    // Event listeners
+    board.addEventListener('layer-add', (e) => {
+      logEvent(`Layer added: ${e.detail.name}`);
+      updateLayerList();
+    });
+
+    board.addEventListener('layer-remove', (e) => {
+      logEvent(`Layer removed: ${e.detail.name}`);
+      updateLayerList();
+    });
+
+    board.addEventListener('layer-change', (e) => {
+      logEvent(`Layer ${e.detail.name}: ${e.detail.property} = ${e.detail.value}`);
+    });
+
+    // Control handlers
+    document.getElementById('showGrid').addEventListener('change', (e) => {
+      board.showGrid = e.target.checked;
+    });
+
+    document.getElementById('gridSize').addEventListener('input', (e) => {
+      const value = parseInt(e.target.value);
+      document.getElementById('gridSizeValue').textContent = value;
+      board.gridSize = value;
+    });
+
+    document.getElementById('debugMode').addEventListener('change', (e) => {
+      board.debug = e.target.checked;
+    });
+
+    document.getElementById('addLayerBtn').addEventListener('click', () => {
+      layerCounter++;
+      const name = `layer-${layerCounter}`;
+      board.addLayer({
+        name,
+        zIndex: layerCounter * 5,
+        opacity: 0.8
+      });
+    });
+
+    document.getElementById('clearAllBtn').addEventListener('click', () => {
+      board.clear();
+      logEvent('All layers cleared');
+    });
+
+    document.getElementById('drawRectBtn').addEventListener('click', () => {
+      const layer = targetLayerSelect.value;
+      if (!layer) return;
+
+      const x = Math.random() * (board.width - 80);
+      const y = Math.random() * (board.height - 60);
+      board.drawRect(layer, x, y, 80, 60, randomColor());
+      logEvent(`Drew rect on ${layer}`);
+    });
+
+    document.getElementById('drawCircleBtn').addEventListener('click', () => {
+      const layer = targetLayerSelect.value;
+      if (!layer) return;
+
+      const x = Math.random() * (board.width - 60) + 30;
+      const y = Math.random() * (board.height - 60) + 30;
+      board.drawCircle(layer, x, y, 30, randomColor());
+      logEvent(`Drew circle on ${layer}`);
+    });
+
+    document.getElementById('drawPatternBtn').addEventListener('click', () => {
+      const layer = targetLayerSelect.value;
+      if (!layer) return;
+
+      board.renderToLayer(layer, (ctx, width, height) => {
+        const gridSize = board.gridSize || 25;
+        const cols = Math.floor(width / gridSize);
+        const rows = Math.floor(height / gridSize);
+
+        for (let y = 0; y < rows; y++) {
+          for (let x = 0; x < cols; x++) {
+            if (Math.random() < 0.2) {
+              ctx.fillStyle = randomColor();
+              ctx.globalAlpha = 0.5;
+              ctx.fillRect(x * gridSize + 2, y * gridSize + 2, gridSize - 4, gridSize - 4);
+            }
+          }
+        }
+        ctx.globalAlpha = 1;
+      });
+      logEvent(`Drew pattern on ${layer}`);
+    });
+
+    document.getElementById('animateBtn').addEventListener('click', () => {
+      animating = !animating;
+
+      if (animating) {
+        document.getElementById('animateBtn').textContent = 'Stop';
+
+        let particles = [];
+        for (let i = 0; i < 20; i++) {
+          particles.push({
+            x: Math.random() * board.width,
+            y: Math.random() * board.height,
+            vx: (Math.random() - 0.5) * 4,
+            vy: (Math.random() - 0.5) * 4,
+            color: randomColor(),
+            size: 5 + Math.random() * 15
+          });
+        }
+
+        function animate() {
+          if (!animating) return;
+
+          const effectsCtx = board.getContext('effects');
+          if (effectsCtx) {
+            effectsCtx.clearRect(0, 0, board.width, board.height);
+
+            particles.forEach(p => {
+              p.x += p.vx;
+              p.y += p.vy;
+
+              // Bounce off walls
+              if (p.x < 0 || p.x > board.width) p.vx *= -1;
+              if (p.y < 0 || p.y > board.height) p.vy *= -1;
+
+              effectsCtx.beginPath();
+              effectsCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              effectsCtx.fillStyle = p.color;
+              effectsCtx.globalAlpha = 0.7;
+              effectsCtx.fill();
+            });
+            effectsCtx.globalAlpha = 1;
+          }
+
+          animationId = requestAnimationFrame(animate);
+        }
+
+        animate();
+        logEvent('Animation started');
+      } else {
+        document.getElementById('animateBtn').textContent = 'Animate';
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
+        board.clearLayer('effects');
+        logEvent('Animation stopped');
+      }
+    });
+
+    // Initialize
+    updateLayerList();
+    logEvent('Board initialized with 4 layers');
+  </script>
+</body>
+</html>

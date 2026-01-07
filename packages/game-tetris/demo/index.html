@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>game-tetris Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+      color: #eee;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #4a90d9;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .description {
+      color: #aaa;
+      margin-bottom: 30px;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .game-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .settings {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .setting {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #16213e;
+      padding: 10px 15px;
+      border-radius: 8px;
+    }
+
+    .setting label {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .setting input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .setting select {
+      background: #0f0f1a;
+      color: #fff;
+      border: 1px solid #4a90d9;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .event-log {
+      width: 100%;
+      max-width: 600px;
+      background: #16213e;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+
+    .event-log h3 {
+      color: #4a90d9;
+      margin: 0 0 10px 0;
+      font-size: 14px;
+    }
+
+    .events {
+      max-height: 150px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 11px;
+    }
+
+    .events p {
+      margin: 5px 0;
+      padding: 5px 10px;
+      background: #0f0f1a;
+      border-radius: 4px;
+    }
+
+    .events p.game-start {
+      border-left: 3px solid #2ecc71;
+    }
+
+    .events p.game-over {
+      border-left: 3px solid #e74c3c;
+    }
+
+    .events p.line-clear {
+      border-left: 3px solid #f39c12;
+    }
+
+    .events p.level-up {
+      border-left: 3px solid #9b59b6;
+    }
+
+    .events p.score-update {
+      border-left: 3px solid #3498db;
+    }
+
+    /* Custom theme for tetris */
+    game-tetris {
+      --game-tetris-bg: #1a1a2e;
+      --game-tetris-board-bg: #0a0a15;
+      --game-tetris-board-border: 3px solid #4a90d9;
+      --game-tetris-panel-bg: #16213e;
+    }
+
+    .theme-neon game-tetris {
+      --game-tetris-bg: #0a0a0a;
+      --game-tetris-board-bg: #000;
+      --game-tetris-board-border: 3px solid #0ff;
+      --game-tetris-panel-bg: #111;
+      --game-tetris-label-color: #0ff;
+      --game-tetris-score-color: #0f0;
+      --game-tetris-button-bg: #0ff;
+      --game-tetris-button-hover-bg: #0aa;
+    }
+
+    .theme-retro game-tetris {
+      --game-tetris-bg: #2d2d2d;
+      --game-tetris-board-bg: #1a1a1a;
+      --game-tetris-board-border: 3px solid #ff6b35;
+      --game-tetris-panel-bg: #3d3d3d;
+      --game-tetris-label-color: #ff6b35;
+      --game-tetris-score-color: #ffd700;
+      --game-tetris-button-bg: #ff6b35;
+    }
+
+    .controls-info {
+      background: #16213e;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      max-width: 600px;
+    }
+
+    .controls-info h3 {
+      color: #4a90d9;
+      margin: 0 0 15px 0;
+      font-size: 14px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .control-item {
+      display: flex;
+      gap: 10px;
+    }
+
+    .control-item kbd {
+      background: #0f0f1a;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #333;
+      font-family: monospace;
+      min-width: 60px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>game-tetris Demo</h1>
+  <p class="description">A complete Tetris game implementation as a web component. Use keyboard controls to play!</p>
+
+  <div class="settings">
+    <div class="setting">
+      <label for="themeSelect">Theme:</label>
+      <select id="themeSelect">
+        <option value="">Default</option>
+        <option value="theme-neon">Neon</option>
+        <option value="theme-retro">Retro</option>
+      </select>
+    </div>
+    <div class="setting">
+      <label for="ghostToggle">Ghost Piece:</label>
+      <input type="checkbox" id="ghostToggle" checked>
+    </div>
+    <div class="setting">
+      <label for="gridToggle">Show Grid:</label>
+      <input type="checkbox" id="gridToggle" checked>
+    </div>
+  </div>
+
+  <div class="game-wrapper" id="gameWrapper">
+    <game-tetris id="tetris"></game-tetris>
+  </div>
+
+  <div class="controls-info">
+    <h3>Keyboard Controls</h3>
+    <div class="controls-grid">
+      <div class="control-item">
+        <kbd>Left / A</kbd>
+        <span>Move left</span>
+      </div>
+      <div class="control-item">
+        <kbd>Right / D</kbd>
+        <span>Move right</span>
+      </div>
+      <div class="control-item">
+        <kbd>Down / S</kbd>
+        <span>Soft drop</span>
+      </div>
+      <div class="control-item">
+        <kbd>Up / W / X</kbd>
+        <span>Rotate</span>
+      </div>
+      <div class="control-item">
+        <kbd>Space</kbd>
+        <span>Hard drop</span>
+      </div>
+      <div class="control-item">
+        <kbd>P / Esc</kbd>
+        <span>Pause</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="event-log">
+    <h3>Event Log</h3>
+    <div class="events" id="events"></div>
+  </div>
+
+  <script type="module">
+    import '../src/game-tetris.js';
+
+    const tetris = document.getElementById('tetris');
+    const gameWrapper = document.getElementById('gameWrapper');
+    const events = document.getElementById('events');
+
+    // Log event helper
+    function logEvent(message, type) {
+      const p = document.createElement('p');
+      p.className = type;
+      p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      events.insertBefore(p, events.firstChild);
+      if (events.children.length > 20) {
+        events.removeChild(events.lastChild);
+      }
+    }
+
+    // Event listeners
+    tetris.addEventListener('game-start', (e) => {
+      logEvent(`Game started! Level: ${e.detail.level}, Speed: ${e.detail.speed}ms`, 'game-start');
+    });
+
+    tetris.addEventListener('game-over', (e) => {
+      logEvent(`Game Over! Score: ${e.detail.score}, Level: ${e.detail.level}, Lines: ${e.detail.lines}`, 'game-over');
+    });
+
+    tetris.addEventListener('line-clear', (e) => {
+      const linesText = e.detail.lines === 1 ? 'line' : 'lines';
+      logEvent(`Cleared ${e.detail.lines} ${linesText}! Total: ${e.detail.totalLines}`, 'line-clear');
+    });
+
+    tetris.addEventListener('level-up', (e) => {
+      logEvent(`Level up! Now level ${e.detail.level}, Speed: ${e.detail.speed}ms`, 'level-up');
+    });
+
+    tetris.addEventListener('score-update', (e) => {
+      if (e.detail.pointsAdded > 10) {
+        logEvent(`+${e.detail.pointsAdded} points! Total: ${e.detail.score}`, 'score-update');
+      }
+    });
+
+    // Settings controls
+    document.getElementById('themeSelect').addEventListener('change', (e) => {
+      gameWrapper.className = 'game-wrapper ' + e.target.value;
+    });
+
+    document.getElementById('ghostToggle').addEventListener('change', (e) => {
+      tetris.showGhost = e.target.checked;
+    });
+
+    document.getElementById('gridToggle').addEventListener('change', (e) => {
+      tetris.showGrid = e.target.checked;
+    });
+  </script>
+</body>
+</html>

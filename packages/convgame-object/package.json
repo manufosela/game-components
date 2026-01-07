@@ -1,0 +1,42 @@
+{
+  "name": "@manufosela/convgame-object",
+  "version": "1.0.0",
+  "description": "Game object wrapper with physics properties and collision detection for canvas-based games",
+  "main": "src/convgame-object.js",
+  "module": "src/convgame-object.js",
+  "type": "module",
+  "files": [
+    "src/**/*"
+  ],
+  "scripts": {
+    "dev": "web-dev-server --node-resolve --open demo/",
+    "build": "echo 'No build step required'",
+    "test": "web-test-runner test/**/*.test.js --node-resolve --coverage",
+    "lint": "eslint src/**/*.js"
+  },
+  "keywords": [
+    "web-component",
+    "lit",
+    "game",
+    "physics",
+    "collision",
+    "canvas"
+  ],
+  "author": "manufosela",
+  "license": "MIT",
+  "dependencies": {
+    "lit": "^3.1.0"
+  },
+  "devDependencies": {
+    "@open-wc/testing": "^4.0.0",
+    "@web/dev-server": "^0.4.1",
+    "@web/test-runner": "^0.18.0",
+    "eslint": "^8.56.0"
+  },
+  "customElements": "custom-elements.json",
+  "exports": {
+    ".": {
+      "import": "./src/convgame-object.js"
+    }
+  }
+}
