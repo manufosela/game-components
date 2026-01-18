@@ -3,6 +3,8 @@ import DemoLayout from "../../../../layouts/DemoLayout.astro";
 import { getComponents } from "../../../../utils/components";
 import { loadDemo } from "../../../../utils/demo-loader";
 import { siteConfig } from "../../../../data/site";
+import CodePanel from "../../../../components/CodePanel.astro";
+import { getUsageSnippet } from "../../../../utils/readme.js";
 
 export function getStaticPaths() {
   const components = getComponents();
@@ -13,6 +15,7 @@ export function getStaticPaths() {
 }
 
 const { component } = Astro.props;
+const snippet = getUsageSnippet(component.slug);
 const demo = loadDemo(component.slug, "demo");
 const links = [
   { label: "← Back to components", href: siteConfig.basePath || "/" },
@@ -34,4 +37,5 @@ if (component.hasPlayground) {
   ) : (
     <p>No demo content found.</p>
   )}
+  {snippet && <CodePanel code={snippet.code} language={snippet.language} />}
 </DemoLayout>

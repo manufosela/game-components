@@ -1,0 +1,8 @@
+---
+const { code, label = "Usage", language } = Astro.props;
+const suffix = language ? ` (${language})` : "";
+---
+<div>
+  <div class="code-label">{label}{suffix}</div>
+  <pre class="code-panel"><code>{code}</code></pre>
+</div>
