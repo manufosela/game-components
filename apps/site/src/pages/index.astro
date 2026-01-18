@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getComponents } from "../utils/components";
+import { siteConfig } from "../data/site";
+
+const components = getComponents();
+---
+<BaseLayout title={siteConfig.title} navTitle={siteConfig.title}>
+  <h1 class="page-title">{siteConfig.title}</h1>
+  <p class="page-subtitle">{siteConfig.description}</p>
+
+  <div class="card-grid">
+    {components.map((component) => (
+      <a class="card" href={`packages/${component.slug}/demo/`}>
+        <span class="tag">v{component.version}</span>
+        <h3>{component.title}</h3>
+        <p>{component.description}</p>
+      </a>
+    ))}
+  </div>
+</BaseLayout>

@@ -1,0 +1,37 @@
+---
+import DemoLayout from "../../../../layouts/DemoLayout.astro";
+import { getComponents } from "../../../../utils/components";
+import { loadDemo } from "../../../../utils/demo-loader";
+import { siteConfig } from "../../../../data/site";
+
+export function getStaticPaths() {
+  const components = getComponents();
+  return components.map((component) => ({
+    params: { slug: component.slug },
+    props: { component },
+  }));
+}
+
+const { component } = Astro.props;
+const demo = loadDemo(component.slug, "demo");
+const links = [
+  { label: "← Back to components", href: siteConfig.basePath || "/" },
+  { label: "GitHub Repo", href: siteConfig.repoUrl },
+];
+
+if (component.hasPlayground) {
+  links.push({ label: "Playground", href: `../../${component.slug}/playground/` });
+}
+---
+<DemoLayout title={component.title} subtitle={component.description} links={links}>
+  {demo ? (
+    <>
+      {demo.links && <div set:html={demo.links} />}
+      {demo.styles && <div set:html={demo.styles} />}
+      <div class="demo-embed" set:html={demo.body} />
+      {demo.scripts && <div set:html={demo.scripts} />}
+    </>
+  ) : (
+    <p>No demo content found.</p>
+  )}
+</DemoLayout>

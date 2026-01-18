@@ -8,6 +8,9 @@
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
+    "site:dev": "pnpm --dir apps/site dev",
+    "site:build": "SITE_URL=https://manufosela.github.io/game-components/ BASE_PATH=/game-components/ pnpm --dir apps/site build",
+    "site:preview": "pnpm --dir apps/site preview",
     "changeset": "changeset",
     "version": "changeset version",
     "publish": "pnpm build && changeset publish"

@@ -1,0 +1,12 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import DemoHeader from "../components/DemoHeader.astro";
+
+const { title, subtitle, links = [], navLinks = [] } = Astro.props;
+---
+<BaseLayout title={title} navTitle={title} navLinks={navLinks}>
+  <DemoHeader title={title} subtitle={subtitle} links={links} />
+  <div class="demo-surface">
+    <slot />
+  </div>
+</BaseLayout>
