@@ -6,6 +6,24 @@ import { siteConfig } from "../../../../data/site";
 import CodePanel from "../../../../components/CodePanel.astro";
 import { getUsageSnippet } from "../../../../utils/readme.js";
 
+const stripTag = (input, tag) =>
+  input.replace(new RegExp(`<\\/?${tag}[^>]*>`, "gi"), "").trim();
+
+const extractImportmaps = (scripts = "") => {
+  const matches = scripts.match(/<script[^>]*type=["']?importmap["']?[^>]*>[\\s\\S]*?<\\/script>/gi);
+  return matches ? matches.join("\n") : "";
+};
+
+const extractScripts = (scripts = "") => {
+  const withoutImportmaps = scripts.replace(
+    /<script[^>]*type=["']?importmap["']?[^>]*>[\\s\\S]*?<\\/script>/gi,
+    ""
+  );
+  return stripTag(withoutImportmaps, "script");
+};
+
+const extractStyles = (styles = "") => stripTag(styles, "style");
+
 export function getStaticPaths() {
   const components = getComponents();
   return components.map((component) => ({
@@ -25,6 +43,12 @@ const links = [
 if (component.hasPlayground) {
   links.push({ label: "Playground", href: `../../${component.slug}/playground/` });
 }
+
+const demoHtml = demo
+  ? [demo.links, extractImportmaps(demo.scripts), demo.body].filter(Boolean).join("\n")
+  : "";
+const demoCss = demo ? extractStyles(demo.styles) : "";
+const demoJs = demo ? extractScripts(demo.scripts) : "";
 ---
 <DemoLayout title={component.title} subtitle={component.description} links={links}>
   {demo ? (
@@ -37,5 +61,15 @@ if (component.hasPlayground) {
   ) : (
     <p>No demo content found.</p>
   )}
-  {snippet && <CodePanel code={snippet.code} language={snippet.language} />}
+
+  {snippet && <CodePanel code={snippet.code} language={snippet.language} label="Usage" />}
+
+  {demo && (
+    <details class="code-details">
+      <summary>Demo code (HTML, CSS, JS)</summary>
+      {demoHtml && <CodePanel code={demoHtml} language="html" label="HTML" />}
+      {demoCss && <CodePanel code={demoCss} language="css" label="CSS" />}
+      {demoJs && <CodePanel code={demoJs} language="js" label="JS" />}
+    </details>
+  )}
 </DemoLayout>

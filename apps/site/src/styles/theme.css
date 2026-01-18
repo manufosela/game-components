@@ -212,3 +212,22 @@ footer {
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
+
+.code-details {
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+}
+
+.code-details summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.code-details[open] summary {
+  margin-bottom: 12px;
+}
