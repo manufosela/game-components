@@ -31,6 +31,24 @@ const rewriteImports = (code = "", packageName = "") => {
     .replace(/import\s+["']\.\.?\/src\/[^"']+["'];?/g, `import "https://esm.sh/${packageName}";`);
 };
 
+const codepenVars = `:root {
+  --bg: #0c0f14;
+  --bg-elevated: #141923;
+  --bg-panel: #171d28;
+  --border: #262f3f;
+  --text: #f4f6fb;
+  --text-muted: #a7b0c2;
+  --text-dim: #7d879b;
+  --accent: #ff8a3d;
+  --accent-strong: #ff6a00;
+  --accent-soft: rgba(255, 138, 61, 0.16);
+  --shadow: 0 20px 50px rgba(5, 8, 14, 0.45);
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --max-width: 1160px;
+}`;
+
 export function getStaticPaths() {
   const components = getComponents();
   return components.map((component) => ({
@@ -54,6 +72,7 @@ if (component.hasPlayground) {
 const demoHtml = demo ? demo.body : "";
 const demoCss = demo ? extractStyles(demo.styles) : "";
 const demoJs = demo ? extractScripts(demo.scripts) : "";
+const codepenCss = demoCss ? `${codepenVars}\n\n${demoCss}` : codepenVars;
 const codepenJs = rewriteImports(demoJs, component.packageName);
 ---
 <DemoLayout title={component.title} subtitle={component.description} links={links}>
@@ -74,7 +93,7 @@ const codepenJs = rewriteImports(demoJs, component.packageName);
     <details class="code-details">
       <summary>Demo code (CodePen-ready HTML, CSS, JS)</summary>
       {demoHtml && <CodePanel code={demoHtml} language="html" label="HTML" />}
-      {demoCss && <CodePanel code={demoCss} language="css" label="CSS" />}
+      {codepenCss && <CodePanel code={codepenCss} language="css" label="CSS" />}
       {codepenJs && <CodePanel code={codepenJs} language="js" label="JS" />}
     </details>
   )}
