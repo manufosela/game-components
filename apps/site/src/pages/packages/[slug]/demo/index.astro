@@ -69,7 +69,7 @@ if (component.hasPlayground) {
   links.push({ label: "Playground", href: `../../${component.slug}/playground/` });
 }
 
-const demoHtml = demo ? demo.body : "";
+const demoHtml = demo ? [demo.links, demo.body].filter(Boolean).join("\n") : "";
 const demoCss = demo ? extractStyles(demo.styles) : "";
 const demoJs = demo ? extractScripts(demo.scripts) : "";
 const codepenCss = demoCss ? `${codepenVars}\n\n${demoCss}` : codepenVars;
