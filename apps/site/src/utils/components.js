@@ -26,6 +26,7 @@ export function getComponents() {
       return {
         slug,
         title: pkg.displayName || pkg.name || toTitle(slug),
+        packageName: pkg.name || slug,
         description: pkg.description || "",
         version: pkg.version || "0.0.0",
         hasDemo: fs.existsSync(demoPath),

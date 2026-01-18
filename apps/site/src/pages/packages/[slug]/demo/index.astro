@@ -24,6 +24,13 @@ const extractScripts = (scripts = "") => {
 
 const extractStyles = (styles = "") => stripTag(styles, "style");
 
+const rewriteImports = (code = "", packageName = "") => {
+  if (!code || !packageName) return code;
+  return code
+    .replace(/from\s+["']\.\.?\/src\/[^"']+["']/g, `from "https://esm.sh/${packageName}"`)
+    .replace(/import\s+["']\.\.?\/src\/[^"']+["'];?/g, `import "https://esm.sh/${packageName}";`);
+};
+
 export function getStaticPaths() {
   const components = getComponents();
   return components.map((component) => ({
@@ -44,11 +51,10 @@ if (component.hasPlayground) {
   links.push({ label: "Playground", href: `../../${component.slug}/playground/` });
 }
 
-const demoHtml = demo
-  ? [demo.links, extractImportmaps(demo.scripts), demo.body].filter(Boolean).join("\n")
-  : "";
+const demoHtml = demo ? demo.body : "";
 const demoCss = demo ? extractStyles(demo.styles) : "";
 const demoJs = demo ? extractScripts(demo.scripts) : "";
+const codepenJs = rewriteImports(demoJs, component.packageName);
 ---
 <DemoLayout title={component.title} subtitle={component.description} links={links}>
   {demo ? (
@@ -66,10 +72,10 @@ const demoJs = demo ? extractScripts(demo.scripts) : "";
 
   {demo && (
     <details class="code-details">
-      <summary>Demo code (HTML, CSS, JS)</summary>
+      <summary>Demo code (CodePen-ready HTML, CSS, JS)</summary>
       {demoHtml && <CodePanel code={demoHtml} language="html" label="HTML" />}
       {demoCss && <CodePanel code={demoCss} language="css" label="CSS" />}
-      {demoJs && <CodePanel code={demoJs} language="js" label="JS" />}
+      {codepenJs && <CodePanel code={codepenJs} language="js" label="JS" />}
     </details>
   )}
 </DemoLayout>
