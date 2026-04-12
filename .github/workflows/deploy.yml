@@ -29,6 +29,8 @@ jobs:
         run: pnpm install
       - name: Build site
         run: SITE_URL=https://manufosela.github.io/game-components/ BASE_PATH=/game-components/ pnpm --dir apps/site build
+      - name: Copy package sources into dist
+        run: node scripts/copy-package-sources.mjs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

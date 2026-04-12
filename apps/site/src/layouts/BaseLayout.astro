@@ -12,6 +12,14 @@ const { title, navTitle, navLinks = [] } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <script type="importmap" is:inline>
+      {
+        "imports": {
+          "lit": "https://esm.sh/lit@3",
+          "lit/": "https://esm.sh/lit@3/"
+        }
+      }
+    </script>
     <ViewTransitions />
   </head>
   <body>
