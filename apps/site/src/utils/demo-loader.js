@@ -32,7 +32,10 @@ const stripShell = (html) =>
     .replace(/<footer[\s\S]*?<\/footer>/i, "");
 
 const stripGlobalSelectors = (styles) =>
-  styles.replace(/[^}]*\b(html|body)\b[^}]*\{[\s\S]*?\}/gi, "");
+  styles.replace(
+    /(?<=^|[}>])\s*(?:html|body)\b[^{]*\{[^}]*\}/gi,
+    ""
+  );
 
 const extractHref = (tag) => {
   const match = tag.match(/href=["']([^"']+)["']/i);
