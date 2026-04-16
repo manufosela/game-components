@@ -3,4 +3,5 @@ export const siteConfig = {
   description: "Interactive game components with playable demos and usage snippets.",
   repoUrl: "https://github.com/manufosela/game-components",
   basePath: "/game-components/",
+  homeUrl: "https://manufosela.dev/",
 };

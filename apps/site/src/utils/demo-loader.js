@@ -94,7 +94,8 @@ export function loadDemo(slug, kind = "demo") {
     linkTags,
     path.dirname(filePath)
   );
-  const styles = collectTags(head, "style") + "\n" + collectTags(body, "style") + "\n" + inlineStyles;
+  const wrappedInline = inlineStyles ? `<style>\n${inlineStyles}\n</style>` : "";
+  const styles = collectTags(head, "style") + "\n" + collectTags(body, "style") + "\n" + wrappedInline;
   const scripts = collectTags(head, "script") + "\n" + collectTags(body, "script");
   const cleanedBody = stripShell(stripTags(body)).trim();
 

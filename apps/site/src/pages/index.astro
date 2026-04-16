@@ -5,7 +5,7 @@ import { siteConfig } from "../data/site";
 
 const components = getComponents();
 ---
-<BaseLayout title={siteConfig.title} navTitle={siteConfig.title}>
+<BaseLayout title={siteConfig.title} navTitle={siteConfig.title} navLinks={[{label: "\u2190 manufosela.dev", href: siteConfig.homeUrl}]}>
   <h1 class="page-title">{siteConfig.title}</h1>
   <p class="page-subtitle">{siteConfig.description}</p>
 
