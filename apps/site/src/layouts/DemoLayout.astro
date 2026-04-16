@@ -2,9 +2,9 @@
 import BaseLayout from "./BaseLayout.astro";
 import DemoHeader from "../components/DemoHeader.astro";
 
-const { title, subtitle, links = [], navLinks = [] } = Astro.props;
+const { title, subtitle, links = [], navLinks = [], headExtra = "" } = Astro.props;
 ---
-<BaseLayout title={title} navTitle={title} navLinks={navLinks}>
+<BaseLayout title={title} navTitle={title} navLinks={navLinks} headExtra={headExtra}>
   <DemoHeader title={title} subtitle={subtitle} links={links} />
   <div class="demo-surface">
     <slot />

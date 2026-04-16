@@ -69,17 +69,16 @@ if (component.hasPlayground) {
   links.push({ label: "Playground", href: `../../${component.slug}/playground/` });
 }
 
+const headExtra = demo ? [demo.links, demo.styles].filter(Boolean).join("\n") : "";
 const demoHtml = demo ? [demo.links, demo.body].filter(Boolean).join("\n") : "";
 const demoCss = demo ? extractStyles(demo.styles) : "";
 const demoJs = demo ? extractScripts(demo.scripts) : "";
 const codepenCss = demoCss ? `${codepenVars}\n\n${demoCss}` : codepenVars;
 const codepenJs = rewriteImports(demoJs, component.packageName);
 ---
-<DemoLayout title={component.title} subtitle={component.description} links={links}>
+<DemoLayout title={component.title} subtitle={component.description} links={links} headExtra={headExtra}>
   {demo ? (
     <>
-      {demo.links && <div set:html={demo.links} />}
-      {demo.styles && <div set:html={demo.styles} />}
       <div class="demo-embed" set:html={demo.body} />
       {demo.scripts && <div set:html={demo.scripts} />}
     </>

@@ -14,17 +14,16 @@ export function getStaticPaths() {
 
 const { component } = Astro.props;
 const demo = loadDemo(component.slug, "playground");
+const headExtra = demo ? [demo.links, demo.styles].filter(Boolean).join("\n") : "";
 const links = [
   { label: "← Back to components", href: siteConfig.basePath || "/" },
   { label: "Demo", href: `../../${component.slug}/demo/` },
   { label: "GitHub Repo", href: siteConfig.repoUrl },
 ];
 ---
-<DemoLayout title={`${component.title} Playground`} subtitle={component.description} links={links}>
+<DemoLayout title={`${component.title} Playground`} subtitle={component.description} links={links} headExtra={headExtra}>
   {demo ? (
     <>
-      {demo.links && <div set:html={demo.links} />}
-      {demo.styles && <div set:html={demo.styles} />}
       <div class="demo-embed" set:html={demo.body} />
       {demo.scripts && <div set:html={demo.scripts} />}
     </>
