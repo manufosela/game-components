@@ -4,7 +4,7 @@ import TopNav from "../components/TopNav.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/theme.css";
 
-const { title, navTitle, navLinks = [] } = Astro.props;
+const { title, navTitle, navLinks = [], headExtra = "" } = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -21,6 +21,7 @@ const { title, navTitle, navLinks = [] } = Astro.props;
       }
     </script>
     <ViewTransitions />
+    <Fragment set:html={headExtra} />
   </head>
   <body>
     <TopNav title={navTitle ?? title} links={navLinks} />
