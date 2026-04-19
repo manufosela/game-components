@@ -157,6 +157,16 @@ export const styles = css`
     transition: width 0.3s ease;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .overlay button,
+    .level-progress {
+      transition: none;
+    }
+    .overlay button:active {
+      transform: none;
+    }
+  }
+
   /* CSS Custom Properties */
   :host {
     --game-tetris-font-family: 'Courier New', monospace;

@@ -67,6 +67,15 @@ export const styles = css`
     right: 2px;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    :host {
+      transition: none;
+    }
+    .cell {
+      transition: none;
+    }
+  }
+
   /* Custom properties documentation */
   :host {
     --living-wccell-size: 20px;
